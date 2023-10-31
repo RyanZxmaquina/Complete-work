@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário com Bloco de Notas</title>
+    
+    <form method="POST" action="/salvar-anotacao">
+    
+    <style>
+        body {
+            background-color: rgb(25, 195, 125); /* Altera a cor de fundo da página */
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 2%;
+        }
+    
+        h1 {
+            color: #fff; /* Altera a cor do título para branco */
+        }
+    
+        button {
+            background-color: #3498db; /* Altera a cor de fundo dos botões */
+            color: #fff; /* Altera a cor do texto dos botões para branco */
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    
+        button:hover {
+            background-color: #2980b9; /* Altera a cor de fundo dos botões ao passar o mouse */
+        }
+    
+        .calendar {
+            border-collapse: collapse;
+            margin: 0 auto;
+            background-color: #fff; /* Altera a cor de fundo da tabela */
+            width: 80%; /* Define a largura da tabela */
+        }
+    
+        .calendar, th, td {
+            border: 1px solid #000;
+        }
+    
+        th, td {
+            padding: 10px;
+        }
+    
+        #currentMonthYear {
+            font-size: 18px;
+            color: #fff; /* Altera a cor do texto do mês/ano para branco */
+        }
+    
+        .note-container2 {
+            background-color: #f2f2f2; /* Cor de fundo para a área de anotações */
+            padding: 20px;
+            margin-top: 20px;
+        }
+    
+        .note-container h2 {
+            margin-bottom: 10px;
+        }
+    
+        .note-input {
+            width: 100%;
+            height: 100px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calendário com Bloco de Notas</h1>
+    
+    <button onclick="previousMonth()">Mês Anterior</button>
+    <span id="currentMonthYear"></span>
+    <button onclick="nextMonth()">Próximo Mês</button>
+    
+    <div class="calendar">
+        <table>
+            <thead>
+                <tr>
+                    <th>Domingo</th>
+                    <th>Segunda</th>
+                    <th>Terça</th>
+                    <th>Quarta</th>
+                    <th>Quinta</th>
+                    <th>Sexta</th>
+                    <th>Sábado</th>
+                </tr>
+            </thead>
+            <tbody id="calendarBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note-container2">
+        <h2>Notas do Dia</h2>
+        <textarea class="note-input" id="noteInput" name="anotacao"></textarea>
+    </div>
+
+    <button type="submit">Salvar Anotações</button>
+    <script>
+        const calendarBody = document.getElementById('calendarBody');
+        const currentMonthYear = document.getElementById('currentMonthYear');
+        const noteInput = document.getElementById('noteInput');
+        let currentDate = new Date();
+        const annotations = {}; // Objeto para armazenar as anotações
+    
+        function showCalendar() {
+            let year = currentDate.getFullYear();
+            let month = currentDate.getMonth();
+            let firstDay = new Date(year, month, 1);
+            let lastDay = new Date(year, month + 1, 0);
+            currentMonthYear.textContent = `${new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentDate)}`;
+            calendarBody.innerHTML = '';
+    
+            let date = new Date(firstDay);
+            while (date <= lastDay) {
+                let row = document.createElement('tr');
+    
+                for (let i = 0; i < 7; i++) {
+                    let cell = document.createElement('td');
+                    cell.textContent = date.getDate();
+                    cell.classList.add('date-cell'); // Adiciona a classe 'date-cell' às células
+                    let dateString = date.toISOString().split('T')[0];
+    
+                    if (annotations[dateString]) {
+                        const annotationContainer = document.createElement('div');
+                        annotationContainer.classList.add('annotation-container');
+                        cell.appendChild(annotationContainer);
+    
+                        const annotationInput = document.createElement('input');
+                        annotationInput.classList.add('annotation-input');
+                        annotationInput.type = 'text';
+                        annotationInput.placeholder = 'Anotações';
+                        annotationInput.value = annotations[dateString];
+                        annotationInput.addEventListener('blur', (e) => {
+                            annotations[dateString] = e.target.value;
+                        });
+                        annotationContainer.appendChild(annotationInput);
+                    }
+    
+                    row.appendChild(cell);
+                    date.setDate(date.getDate() + 1);
+                }
+    
+                calendarBody.appendChild(row);
+            }
+        }
+    
+        noteInput.addEventListener('input', () => {
+            const dateString = currentDate.toISOString().split('T')[0];
+            annotations[dateString] = noteInput.value;
+        });
+    
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            showCalendar();
+        }
+    
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            showCalendar();
+        }
+    
+        function saveAnnotations() {
+            // Aqui, você pode implementar a lógica para salvar as anotações no banco de dados.
+            // Como mencionado anteriormente, a lógica de salvamento no banco de dados deve ser implementada no servidor.
+            // Esta função de exemplo exibe um alerta quando o botão "Salvar" é clicado.
+    
+            alert('Anotações salvas com sucesso!');
+        }
+        showCalendar();
+    </script>
+</body>
+</html>
+
+
+
